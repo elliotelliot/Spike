@@ -30,8 +30,8 @@ int main (int argc, char *argv[]){
 
 
   // Choose an input neuron type
-  GeneratorInputSpikingNeurons* generator_input_neurons = new GeneratorInputSpikingNeurons();
-  // PoissonInputSpikingNeurons* input neurons = new PoissonInputSpikingNeurons();
+  //GeneratorInputSpikingNeurons* generator_input_neurons = new GeneratorInputSpikingNeurons();
+  PoissonInputSpikingNeurons* input_neurons = new PoissonInputSpikingNeurons();
 
   // Choose your neuron type
   LIFSpikingNeurons* lif_spiking_neurons = new LIFSpikingNeurons();
@@ -42,7 +42,7 @@ int main (int argc, char *argv[]){
   // CurrentSpikingSynapses * current_spiking_synapses = new CurrentSpikingSynapses();
 
   // Allocate your chosen components to the simulator
-  ExampleModel->input_spiking_neurons = generator_input_neurons;
+  ExampleModel->input_spiking_neurons = input_neurons;
   ExampleModel->spiking_neurons = lif_spiking_neurons;
   ExampleModel->spiking_synapses = conductance_spiking_synapses;
 
@@ -50,7 +50,7 @@ int main (int argc, char *argv[]){
       ADD ANY ACTIVITY MONITORS OR PLASTICITY RULES YOU WISH FOR 
   */
   SpikingActivityMonitor* spike_monitor = new SpikingActivityMonitor(lif_spiking_neurons);
-  SpikingActivityMonitor* input_spike_monitor = new SpikingActivityMonitor(generator_input_neurons);
+  SpikingActivityMonitor* input_spike_monitor = new SpikingActivityMonitor(input_neurons);
   ExampleModel->AddActivityMonitor(spike_monitor);
   ExampleModel->AddActivityMonitor(input_spike_monitor);
 
@@ -64,10 +64,12 @@ int main (int argc, char *argv[]){
 
   // SETTING UP INPUT NEURONS
   // Creating an input neuron parameter structure
-  generator_input_spiking_neuron_parameters_struct* input_neuron_params = new generator_input_spiking_neuron_parameters_struct();
+  poisson_input_spiking_neuron_parameters_struct* input_neuron_params = new poisson_input_spiking_neuron_parameters_struct();
   // Setting the dimensions of the input neuron layer
   input_neuron_params->group_shape[0] = 1;    // x-dimension of the input neuron layer
   input_neuron_params->group_shape[1] = 10;   // y-dimension of the input neuron layer
+  // Setting the population firing rate
+    input_neuron_params->rate = 50;
   // Create a group of input neurons. This function returns the ID of the input neuron group
   int input_layer_ID = ExampleModel->AddInputNeuronGroup(input_neuron_params);
 
@@ -140,7 +142,7 @@ int main (int argc, char *argv[]){
 
   /*
       ADD INPUT STIMULI TO THE GENERATOR NEURONS CLASS
-  */
+  
   // We can now assign a set of spike times to neurons in the input layer
   int s1_num_spikes = 5;
   int s1_neuron_ids[5] = {0, 1, 3, 6, 7};
@@ -152,7 +154,8 @@ int main (int argc, char *argv[]){
   int s2_neuron_ids[5] = {2, 5, 9, 8, 0};
   float s2_spike_times[5] = {5.01f, 6.9f, 7.2f, 8.5f, 9.9f};
   int second_stimulus = generator_input_neurons->add_stimulus(s2_num_spikes, s2_neuron_ids, s2_spike_times);
-  
+   
+   */
 
 
   /*
@@ -162,11 +165,11 @@ int main (int argc, char *argv[]){
   // The only argument to run is the number of seconds
   ExampleModel->finalise_model();
   float simtime = 50.0f;
-  generator_input_neurons->select_stimulus(first_stimulus);
+  //generator_input_neurons->select_stimulus(first_stimulus);
   ExampleModel->run(simtime);
 
-  generator_input_neurons->select_stimulus(second_stimulus);
-  ExampleModel->run(simtime);
+  //generator_input_neurons->select_stimulus(second_stimulus);
+  //ExampleModel->run(simtime);
   
 
   //spike_monitor->save_spikes_as_txt("./");
